@@ -24,7 +24,7 @@ Var MoneroWalletAddress
 ;-------------------------------------------------------------------------------
 ; Attributes
 Name "P2Pool for Monero ${VERSION}"
-OutFile "p2pool-${VERSION}-windows-x64-installer.exe"
+OutFile "p2pool-${VERSION}-windows-x64-installer_$%GIT_HASH%.exe"
 InstallDir "$LOCALAPPDATA\p2pool"
 InstallDirRegKey HKCU "Software\p2pool" ""
 RequestExecutionLevel user

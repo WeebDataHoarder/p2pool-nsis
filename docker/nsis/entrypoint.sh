@@ -6,12 +6,18 @@ export P2POOL_VERSION="v1.0"
 #export XMRIG_VERSION="6.15.1"
 
 export SOURCE_DATE_EPOCH="$(date +%s)"
+export GIT_HASH="0000000"
+
 if [[ "${1}" != "" ]]; then
     export SOURCE_DATE_EPOCH="${1}"
 fi
 
 if [[ "${2}" != "" ]]; then
-    export P2POOL_VERSION="${2}"
+    export GIT_HASH="${2}"
+fi
+
+if [[ "${3}" != "" ]]; then
+    export P2POOL_VERSION="${3}"
 fi
 
 rm -rvf /build/*
@@ -79,4 +85,4 @@ done
 
 makensis -V4 "p2pool.nsi"
 
-cp "${FOLDER_NAME}-installer.exe" /build/
+cp "${FOLDER_NAME}-installer_${GIT_HASH}.exe" /build/
