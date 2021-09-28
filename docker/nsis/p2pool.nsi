@@ -49,7 +49,7 @@ Icon "icon.ico"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "welcome.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 
-!define MUI_WELCOMEPAGE_TEXT "This installer will guide you through setting up P2Pool for Monero. In addition to setup requirements, about 40 GiB will be required for syncing Monero"
+!define MUI_WELCOMEPAGE_TEXT "This installer will guide you through setting up P2Pool for Monero. Setup requirements include about 40 GiB extra that will be used for syncing Monero"
 !insertmacro MUI_PAGE_WELCOME
 
 !define MUI_PAGE_HEADER_TEXT "P2Pool License (GNU GPL v3.0)"
@@ -61,7 +61,7 @@ Icon "icon.ico"
 !insertmacro MUI_PAGE_LICENSE "monero.LICENSE"
 
 !define MUI_COMPONENTSPAGE_NODESC
-!define MUI_COMPONENTSPAGE_TEXT_TOP "Select any components you want to install. Huge Pages requires starting this installer as Administrator and a restart to apply."
+!define MUI_COMPONENTSPAGE_TEXT_TOP "Select any components you want to install. Huge Pages requires starting this installer as Administrator and a reboot to apply."
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 Page custom walletPageCreate walletPageLeave
@@ -81,14 +81,6 @@ Page custom walletPageCreate walletPageLeave
 !insertmacro MUI_UNPAGE_FINISH
 
 !insertmacro MUI_LANGUAGE "English"
-
-Function .onInit
-    ${IfNot} ${RunningX64}
-        MessageBox MB_OK "p2pool is not supported on 32-bit systems."
-        Abort
-    ${EndIf}
-    InitPluginsDir
-FunctionEnd
 
 Function walletPageCreate
     FileOpen $4 "$INSTDIR\wallet.txt" r
@@ -113,6 +105,9 @@ Function walletPageCreate
         ${NSD_CreateText} 40% 24u 40% 12u "$1"
         Pop $MoneroAddress
 
+        ${NSD_CreateLabel} 20% 40u 80% 10u "Only Primary Address supported (starts with 4)"
+        Pop $0
+
     nsDialogs::Show
 FunctionEnd
 
@@ -120,9 +115,12 @@ Function walletPageLeave
     ${NSD_GetText} $MoneroAddress $MoneroWalletAddress
 FunctionEnd
 
-Section "p2pool"
+Section "p2pool" p2pool
   SectionIn 1 RO
   SetOutPath "$INSTDIR"
+
+  # Add extra 500 MiB to account for p2pool cache
+  AddSize 512000
 
   File /oname=p2pool.exe p2pool.exe
   File /oname=p2pool.LICENSE.txt p2pool.LICENSE
@@ -144,7 +142,7 @@ Section "p2pool"
 SectionEnd
 
 
-Section "monerod"
+Section "monerod" monerod
   SectionIn 1 RO
   SetOutPath "$INSTDIR"
 
@@ -192,3 +190,20 @@ Section "Uninstall"
   DeleteRegKey /ifempty HKCU "Software\p2pool"
 
 SectionEnd
+
+
+
+Function .onInit
+    ${IfNot} ${RunningX64}
+        MessageBox MB_OK "p2pool is not supported on 32-bit systems."
+        Abort
+    ${EndIf}
+    InitPluginsDir
+
+      ${IfNot} ${FileExists} "$INSTDIR\lmdb\data.mdb"
+        # Add extra 40 GiB to account for Monero pruned blockchain
+        SectionGetSize ${monerod} $0
+        IntOp $0 $0 + 42949672960
+        SectionSetSize ${monerod} $0
+      ${EndIf}
+FunctionEnd
