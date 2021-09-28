@@ -63,6 +63,7 @@ pushd output
 cp /start.ps1 ./
 cp /header.bmp ./
 cp /welcome.bmp ./
+cp /icon.ico ./
 
 makensis -NOCD -V4 "/p2pool.nsi"
 

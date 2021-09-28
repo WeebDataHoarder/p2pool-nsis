@@ -37,7 +37,8 @@ VIAddVersionKey "FileVersion" "${SETUP_VERSION}"
 
 !define MUI_BGCOLOR "FF6600"
 ;!define MUI_TEXTCOLOR "4C4C4C"
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\orange-install.ico"
+Icon "icon.ico"
+!define MUI_ICON "icon.ico"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "header.bmp"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "welcome.bmp"
@@ -63,6 +64,9 @@ Page custom walletPageCreate walletPageLeave
 
 ;!define MUI_FINISHPAGE_RUN "$INSTDIR/start.cmd"
 ;!define MUI_FINISHPAGE_RUN_TEXT "Start P2Pool and Monero"
+
+!define MUI_FINISHPAGE_REBOOTLATER_DEFAULT 1
+!define MUI_FINISHPAGE_TEXT_REBOOT "If you enabled Huge Pages as an Administrator you will have to reboot for them to take effect."
 !insertmacro MUI_PAGE_FINISH
 
 
@@ -118,12 +122,13 @@ Section "p2pool"
   File /oname=p2pool.exe p2pool.exe
   File /oname=p2pool.LICENSE.txt p2pool.LICENSE
   File /oname=start.ps1 start.ps1
+  File /oname=icon.ico icon.ico
 
   FileOpen $9 wallet.txt w
   FileWrite $9 "$MoneroWalletAddress"
   FileClose $9
 
-  CreateShortcut "$DESKTOP\P2Pool for Monero.lnk" "powershell.exe" "-noexit -ExecutionPolicy Bypass -File $\"$INSTDIR\start.ps1$\""
+  CreateShortcut "$DESKTOP\P2Pool for Monero.lnk" "powershell.exe" "-noexit -ExecutionPolicy Bypass -File $\"$INSTDIR\start.ps1$\"" "$INSTDIR\icon.ico" 0
 
   ;Store installation folder
   WriteRegStr HKCU "Software\p2pool" "" $INSTDIR
@@ -160,6 +165,10 @@ Section "Enable Huge Pages" P2PoolHugePages
   UserMgr::AddPrivilege "$0\$1" "SeLockMemoryPrivilege"
   Pop $0
   DetailPrint "Huge Pages: $0"
+  ${If} $0 == "OK"
+    SetRebootFlag true
+  ${EndIf}
+
 
 SectionEnd
 

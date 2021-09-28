@@ -37,6 +37,7 @@ COPY start.ps1 /start.ps1
 COPY p2pool.nsi /p2pool.nsi
 COPY header.bmp /header.bmp
 COPY welcome.bmp /welcome.bmp
+COPY icon.ico /icon.ico
 
 WORKDIR /tmp
 
