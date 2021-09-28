@@ -1,6 +1,7 @@
+Clear-Host
 
 $scriptpath = $MyInvocation.MyCommand.Path
-$dir = Split-Path $scriptpath
+$dir = Split-Path "$scriptpath"
 Push-Location $dir
 
 $Wallet = $null;
@@ -15,11 +16,11 @@ if ($walletExists -eq $false) {
     Write-Host "Using stored wallet address on "$($dir)\wallet.txt": $($Wallet)"
 }
 
-Start-Process -ArgumentList "--data-dir=.", "--log-file", "$dir\bitmonero.log", "--enable-dns-blocklist", "--zmq-pub=tcp://127.0.0.1:18083", "--rpc-bind-ip=127.0.0.1", "--rpc-bind-port=18081", "--restricted-rpc", "--enforce-dns-checkpointing", "--fast-block-sync=1", "--sync-pruned-blocks", "--prune-blockchain", "--check-updates disabled", "--in-peers=8", "--out-peers=16", "--add-priority-node", "node.supportxmr.com:18080" .\monerod.exe
+$Wallet = $Wallet.Trim()
+
+Start-Process .\monerod.exe -ArgumentList "--data-dir=.","--log-file","$dir\bitmonero.log","--enable-dns-blocklist","--zmq-pub=tcp://127.0.0.1:18083","--rpc-bind-ip=127.0.0.1","--rpc-bind-port=18081","--restricted-rpc","--enforce-dns-checkpointing","--fast-block-sync=1", "--sync-pruned-blocks","--prune-blockchain","--check-updates disabled","--in-peers=8","--out-peers=16","--add-priority-node","node.supportxmr.com:18080"
 
 Write-Output "Waiting for monerod to start and sync..."
-
-Start-Sleep -Seconds 15
 
 Do {
     Try{
@@ -30,7 +31,7 @@ Do {
             Start-Sleep -Seconds 5
         }
     } Catch {
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 5
     }
 
 }While ($response.result.synchronized -ne $true)
@@ -39,5 +40,5 @@ Write-Progress -Activity "Waiting for monerod sync" -Completed
 
 Write-Host "Starting p2pool with wallet $Wallet"
 
-Start-Process -PassThru -ArgumentList "--wallet", "$Wallet" .\p2pool.exe
+Start-Process .\p2pool.exe -ArgumentList "--wallet $Wallet" -NoNewWindow
 
