@@ -1,7 +1,12 @@
 !include MUI2.nsh
+!include nsDialogs.nsh
+!include LogicLib.nsh
 !include x64.nsh
 
 Unicode True
+Var Dialog
+Var MoneroAddress
+Var MoneroWalletAddress
 
 ;-------------------------------------------------------------------------------
 ; Constants
@@ -19,6 +24,7 @@ OutFile "p2pool-${VERSION}-windows-x64-installer.exe"
 InstallDir "$LOCALAPPDATA\p2pool"
 InstallDirRegKey HKCU "Software\p2pool" ""
 RequestExecutionLevel user
+ShowInstDetails show
 
 ;-------------------------------------------------------------------------------
 ; Version Info
@@ -29,10 +35,12 @@ VIAddVersionKey "FileDescription" "${PRODUCT_DESCRIPTION}"
 VIAddVersionKey "LegalCopyright" "${COPYRIGHT}"
 VIAddVersionKey "FileVersion" "${SETUP_VERSION}"
 
+!define MUI_BGCOLOR "FF6600"
+;!define MUI_TEXTCOLOR "4C4C4C"
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\orange-install.ico"
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Header\orange.bmp"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "${NSISDIR}\Contrib\Graphics\Wizard\orange.bmp"
+!define MUI_HEADERIMAGE_BITMAP "header.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "welcome.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 
 !define MUI_WELCOMEPAGE_TEXT "This installer will guide you through setting up P2Pool for Monero. In addition to setup requirements, about 40 GiB will be required for syncing Monero"
@@ -46,8 +54,11 @@ VIAddVersionKey "FileVersion" "${SETUP_VERSION}"
 !define MUI_PAGE_HEADER_SUBTEXT "Please review the Monero license before continuing"
 !insertmacro MUI_PAGE_LICENSE "Monero/LICENSE"
 
+!define MUI_COMPONENTSPAGE_NODESC
+!define MUI_COMPONENTSPAGE_TEXT_TOP "Select any components you want to install. Huge Pages requires starting this installer as Administrator and a restart to apply."
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
+Page custom walletPageCreate walletPageLeave
 !insertmacro MUI_PAGE_INSTFILES
 
 ;!define MUI_FINISHPAGE_RUN "$INSTDIR/start.cmd"
@@ -67,17 +78,50 @@ Function .onInit
         MessageBox MB_OK "p2pool is not supported on 32-bit systems."
         Abort
     ${EndIf}
+    InitPluginsDir
 FunctionEnd
 
-Section "P2Pool and Monero" P2Pool
-  SectionIn RO
+Function walletPageCreate
+    FileOpen $4 "$INSTDIR\wallet.txt" r
+    FileRead $4 $1
+    FileClose $4
+
+    !insertmacro MUI_HEADER_TEXT "Monero Address Settings" "Provide a Monero Payout Address for P2Pool. Can be edited later"
+
+    nsDialogs::Create 1018
+    Pop $Dialog
+
+    ${If} $Dialog == error
+        Abort
+    ${EndIf}
+
+    ${NSD_CreateGroupBox} 10% 10u 80% 62u "P2Pool Settings"
+    Pop $0
+
+        ${NSD_CreateLabel} 20% 26u 20% 10u "Monero Address:"
+        Pop $0
+
+        ${NSD_CreateText} 40% 24u 40% 12u "$1"
+        Pop $MoneroAddress
+
+    nsDialogs::Show
+FunctionEnd
+
+Function walletPageLeave
+    ${NSD_GetText} $MoneroAddress $MoneroWalletAddress
+FunctionEnd
+
+Section "p2pool"
+  SectionIn 1 RO
   SetOutPath "$INSTDIR"
 
-  File /oname=monerod.exe Monero/monerod.exe
   File /oname=p2pool.exe p2pool.exe
-  File /oname=monero.LICENSE.txt Monero/LICENSE
   File /oname=p2pool.LICENSE.txt LICENSE
   File /oname=start.ps1 start.ps1
+
+  FileOpen $9 wallet.txt w
+  FileWrite $9 "$MoneroWalletAddress"
+  FileClose $9
 
   CreateShortcut "$DESKTOP\P2Pool for Monero.lnk" "powershell.exe" "-noexit -ExecutionPolicy Bypass -File $\"$INSTDIR\start.ps1$\""
 
@@ -86,6 +130,26 @@ Section "P2Pool and Monero" P2Pool
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+SectionEnd
+
+
+Section "monerod"
+  SectionIn 1 RO
+  SetOutPath "$INSTDIR"
+
+  File /oname=monerod.exe Monero/monerod.exe
+  File /oname=monero.LICENSE.txt Monero/LICENSE
+SectionEnd
+
+Section "Enable Huge Pages" P2PoolHugePages
+  UserMgr::GetCurrentUserName
+  Pop $0
+  DetailPrint "Enabling Huge Pages for $0"
+
+  UserMgr::AddPrivilege "$0" "SeLockMemoryPrivilege"
+  Pop $0
+  DetailPrint "Huge Pages: $0"
 
 SectionEnd
 

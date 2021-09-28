@@ -25,6 +25,8 @@ pushd "${FOLDER_NAME}"
 curl "https://raw.githubusercontent.com/SChernykh/p2pool/${P2POOL_VERSION}/LICENSE" --location --output "LICENSE"
 
 cp /start.ps1 ./
+cp /header.bmp ./
+cp /welcome.bmp ./
 
 makensis -NOCD -V4 "/p2pool.nsi"
 

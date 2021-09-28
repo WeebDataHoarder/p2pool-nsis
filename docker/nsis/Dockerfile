@@ -15,9 +15,18 @@ RUN set -eux; \
     gpg --fingerprint "0x${P2POOL_GPGKEY_FINGERPRINT}" && \
     echo "${P2POOL_GPGKEY_FINGERPRINT}:6:" | gpg --import-ownertrust
 
+RUN mkdir /UserMgrPlugin && cd /UserMgrPlugin && curl https://nsis.sourceforge.io/mediawiki/images/4/4a/UserMgr_%282021%29.zip --output UserMgrPlugin.zip && \
+    unzip UserMgrPlugin.zip && \
+    cp UserMgr/x86-Unicode/UserMgr.dll /usr/share/nsis/Plugins/x86-unicode/ && \
+    cp UserMgr/x86-ANSI/UserMgr.dll /usr/share/nsis/Plugins/x86-ansi/ && \
+    cd / && rm -rvf /UserMgrPlugin
+
+
 COPY entrypoint.sh /entrypoint.sh
 COPY start.ps1 /start.ps1
 COPY p2pool.nsi /p2pool.nsi
+COPY header.bmp /header.bmp
+COPY welcome.bmp /welcome.bmp
 
 WORKDIR /tmp
 
