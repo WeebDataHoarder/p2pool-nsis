@@ -7,7 +7,7 @@ Push-Location $dir
 $Wallet = "";
 $walletExists = Test-Path -Path "$dir\wallet.txt" -PathType leaf
 if ($walletExists) {
-    $Wallet = Get-Content "$dir\wallet.txt" -Raw
+    $Wallet = [IO.File]::ReadAllText("$dir\wallet.txt")
     $Wallet = $Wallet.Trim()
     Write-Host "Using stored wallet address on "$($dir)\wallet.txt": $($Wallet)"
 }
