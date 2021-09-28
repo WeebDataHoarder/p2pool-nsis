@@ -5,8 +5,13 @@ set -ex
 export P2POOL_VERSION="v1.0"
 #export XMRIG_VERSION="6.15.1"
 
+export SOURCE_DATE_EPOCH="$(date +%s)"
 if [[ "${1}" != "" ]]; then
-    export P2POOL_VERSION="${1}"
+    export SOURCE_DATE_EPOCH="${1}"
+fi
+
+if [[ "${2}" != "" ]]; then
+    export P2POOL_VERSION="${2}"
 fi
 
 rm -rvf /build/*
@@ -60,11 +65,18 @@ curl "https://raw.githubusercontent.com/SChernykh/p2pool/${P2POOL_VERSION}/LICEN
 #popd
 
 pushd output
+
 cp /start.ps1 ./
 cp /header.bmp ./
 cp /welcome.bmp ./
 cp /icon.ico ./
+cp /p2pool.nsi ./
 
-makensis -NOCD -V4 "/p2pool.nsi"
+#Set mtime for reproducible builds
+for f in ./*; do
+  touch --date="@${SOURCE_DATE_EPOCH}" "$f"
+done
+
+makensis -V4 "p2pool.nsi"
 
 cp "${FOLDER_NAME}-installer.exe" /build/

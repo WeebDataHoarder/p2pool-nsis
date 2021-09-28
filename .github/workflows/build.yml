@@ -20,6 +20,8 @@ jobs:
         uses: docker-practice/actions-setup-docker@master
       - name: Build Installer
         run: ./build.sh
+      - name: Get Hash
+        run: sha256sum build/nsis/*
       - name: Archive build result
         uses: actions/upload-artifact@v2
         with:

@@ -3,6 +3,10 @@
 !include LogicLib.nsh
 !include x64.nsh
 
+SetCompressor /SOLID lzma
+SetCompressorDictSize 64
+
+CRCCheck on
 Unicode True
 Var Dialog
 Var MoneroAddress
@@ -25,6 +29,7 @@ InstallDir "$LOCALAPPDATA\p2pool"
 InstallDirRegKey HKCU "Software\p2pool" ""
 RequestExecutionLevel user
 ShowInstDetails show
+ShowUninstDetails show
 
 ;-------------------------------------------------------------------------------
 ; Version Info
