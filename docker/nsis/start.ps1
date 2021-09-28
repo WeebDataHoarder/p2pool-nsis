@@ -59,7 +59,7 @@ Do {
 
 }While (-Not $response.result.synchronized)
 
-Write-Progress -Activity "Waiting for monerod sync" -Completed
+Write-Progress -Activity "Waiting for monerod sync" -Completed -status "$percent% Complete:"
 
 Write-Output "Starting p2pool with wallet $Wallet"
 
