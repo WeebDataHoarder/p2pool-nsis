@@ -48,11 +48,11 @@ VIAddVersionKey "FileVersion" "${SETUP_VERSION}"
 
 !define MUI_PAGE_HEADER_TEXT "P2Pool License (GNU GPL v3.0)"
 !define MUI_PAGE_HEADER_SUBTEXT "Please review the P2Pool license before continuing"
-!insertmacro MUI_PAGE_LICENSE "LICENSE"
+!insertmacro MUI_PAGE_LICENSE "p2pool.LICENSE"
 
 !define MUI_PAGE_HEADER_TEXT "Monero License (MIT)"
 !define MUI_PAGE_HEADER_SUBTEXT "Please review the Monero license before continuing"
-!insertmacro MUI_PAGE_LICENSE "Monero/LICENSE"
+!insertmacro MUI_PAGE_LICENSE "monero.LICENSE"
 
 !define MUI_COMPONENTSPAGE_NODESC
 !define MUI_COMPONENTSPAGE_TEXT_TOP "Select any components you want to install. Huge Pages requires starting this installer as Administrator and a restart to apply."
@@ -116,7 +116,7 @@ Section "p2pool"
   SetOutPath "$INSTDIR"
 
   File /oname=p2pool.exe p2pool.exe
-  File /oname=p2pool.LICENSE.txt LICENSE
+  File /oname=p2pool.LICENSE.txt p2pool.LICENSE
   File /oname=start.ps1 start.ps1
 
   FileOpen $9 wallet.txt w
@@ -138,16 +138,26 @@ Section "monerod"
   SectionIn 1 RO
   SetOutPath "$INSTDIR"
 
-  File /oname=monerod.exe Monero/monerod.exe
-  File /oname=monero.LICENSE.txt Monero/LICENSE
+  File /oname=monerod.exe monerod.exe
+  File /oname=monero.LICENSE.txt monero.LICENSE
 SectionEnd
 
-Section "Enable Huge Pages" P2PoolHugePages
-  UserMgr::GetCurrentUserName
-  Pop $0
-  DetailPrint "Enabling Huge Pages for $0"
+#Section "xmrig"
+#  SetOutPath "$INSTDIR"
+#
+#  File /oname=xmrig.exe xmrig.exe
+#  File /oname=.xmrig.json xmrig.json
+#SectionEnd
 
-  UserMgr::AddPrivilege "$0" "SeLockMemoryPrivilege"
+Section "Enable Huge Pages" P2PoolHugePages
+  UserMgr::GetCurrentDomain
+  Pop $0
+
+  UserMgr::GetCurrentUserName
+  Pop $1
+  DetailPrint "Enabling Huge Pages for $0\$1"
+
+  UserMgr::AddPrivilege "$0\$1" "SeLockMemoryPrivilege"
   Pop $0
   DetailPrint "Huge Pages: $0"
 

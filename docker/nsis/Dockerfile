@@ -9,11 +9,21 @@ RUN DEBIAN_FRONTEND=noninteractive apt update && \
 ARG P2POOL_GPGKEY_URL=https://raw.githubusercontent.com/monero-project/gitian.sigs/50672d1513f3aedc144a98b8b11224e9f6f75ef2/gitian-pubkeys/SChernykh.asc
 ARG P2POOL_GPGKEY_FINGERPRINT=1FCAAB4D3DC3310D16CBD508C47F82B54DA87ADF
 
+
 # Import and trust GPG key for signed releases
 RUN set -eux; \
     curl "${P2POOL_GPGKEY_URL}" | gpg --import - && \
     gpg --fingerprint "0x${P2POOL_GPGKEY_FINGERPRINT}" && \
     echo "${P2POOL_GPGKEY_FINGERPRINT}:6:" | gpg --import-ownertrust
+
+
+#ARG XMRIG_GPGKEY_URL=https://raw.githubusercontent.com/xmrig/xmrig/997f90dae73f74171a6d25e6b83f287715c4b0d0/doc/gpg_keys/xmrig.asc
+#ARG XMRIG_GPGKEY_FINGERPRINT=9AC4CEA8E66E35A5C7CDDC1B446A53638BE94409
+#
+#RUN set -eux; \
+#    curl "${XMRIG_GPGKEY_URL}" | gpg --import - && \
+#    gpg --fingerprint "0x${XMRIG_GPGKEY_FINGERPRINT}" && \
+#    echo "${XMRIG_GPGKEY_FINGERPRINT}:6:" | gpg --import-ownertrust
 
 RUN mkdir /UserMgrPlugin && cd /UserMgrPlugin && curl https://nsis.sourceforge.io/mediawiki/images/4/4a/UserMgr_%282021%29.zip --output UserMgrPlugin.zip && \
     unzip UserMgrPlugin.zip && \
