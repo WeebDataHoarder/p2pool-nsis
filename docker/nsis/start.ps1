@@ -45,11 +45,13 @@ Start-Process .\monerod.exe -ArgumentList "--data-dir=.","--log-file","$dir\bitm
 
 Write-Output "Waiting for monerod to start and sync..."
 
+$percent = 100.0;
+
 Do {
     Try{
         $response = Get-Monero-Status
         if (-Not $response.result.synchronized) {
-            $percent = ($response.result.height/$response.result.target_height*100)
+            $percent = [math]::Round($response.result.height/$response.result.target_height*100, 3)
             Write-Progress -Activity "Waiting for monerod sync" -Status "$percent% Complete:" -PercentComplete $percent
             Start-Sleep -Seconds 5
         }
@@ -59,7 +61,7 @@ Do {
 
 }While (-Not $response.result.synchronized)
 
-Write-Progress -Activity "Waiting for monerod sync" -Completed -status "$percent% Complete:"
+Write-Progress -Activity "Waiting for monerod sync" -Completed -Status "$percent% Complete:"
 
 Write-Output "Starting p2pool with wallet $Wallet"
 
