@@ -3,7 +3,7 @@
 Windows installer for [Monero's P2Pool](https://github.com/SChernykh/p2pool).
 
 ## Download
-**[Get the last stable release here](https://github.com/WeebDataHoarder/p2pool-nsis/releases)**
+**[Get the last stable release here](https://github.com/WeebDataHoarder/p2pool-nsis/releases/latest)**
 
 ## Features
 * Uses [P2Pool released binaries](https://github.com/SChernykh/p2pool/releases), with checked signatures
