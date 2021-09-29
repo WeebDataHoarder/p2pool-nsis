@@ -87,5 +87,5 @@ Write-Progress -Activity "Waiting for monerod sync" -Completed -Status "$percent
 
 Write-Output "Starting p2pool with wallet $Wallet"
 
-Start-Process .\p2pool.exe -ArgumentList "--wallet $Wallet" -NoNewWindow
+Start-Process .\p2pool.exe -ArgumentList "--wallet $Wallet" -Wait -NoNewWindow
 
