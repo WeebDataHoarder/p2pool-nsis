@@ -5,6 +5,8 @@
 
 SetCompressor /SOLID lzma
 SetCompressorDictSize 64
+SetDateSave off
+SetOverwrite on
 
 CRCCheck on
 Unicode True
@@ -30,6 +32,9 @@ InstallDirRegKey HKCU "Software\p2pool" ""
 RequestExecutionLevel user
 ShowInstDetails show
 ShowUninstDetails show
+BrandingText "p2pool.io :: github.com/WeebDataHoarder/p2pool-nsis"
+ManifestDPIAware true
+ManifestSupportedOS Win7 Win8 Win8.1 Win10
 
 ;-------------------------------------------------------------------------------
 ; Version Info
