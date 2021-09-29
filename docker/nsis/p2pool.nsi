@@ -53,6 +53,7 @@ Icon "icon.ico"
 !define MUI_HEADERIMAGE_BITMAP "header.bmp"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "welcome.bmp"
 !define MUI_FINISHPAGE_NOAUTOCLOSE
+!define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 !define MUI_WELCOMEPAGE_TEXT "This installer will guide you through setting up P2Pool for Monero. Setup requirements include about 40 GiB extra that will be used for syncing Monero"
 !insertmacro MUI_PAGE_WELCOME
@@ -81,6 +82,7 @@ Page custom walletPageCreate walletPageLeave
 
 
 !insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_COMPONENTS
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
@@ -192,22 +194,57 @@ Section "Enable Huge Pages" P2PoolHugePages
     SetRebootFlag true
   ${EndIf}
 
-
 SectionEnd
 
-Section "Uninstall"
 
+
+Section "un.p2pool" un.p2pool
   Delete "$DESKTOP\P2Pool for Monero.lnk"
-  Delete "$INSTDIR\monerod.exe"
   Delete "$INSTDIR\p2pool.exe"
   Delete "$INSTDIR\start.ps1"
-  Delete "$INSTDIR\monero.LICENSE.txt"
+  Delete "$INSTDIR\icon.ico"
   Delete "$INSTDIR\p2pool.LICENSE.txt"
   Delete "$INSTDIR\Uninstall.exe"
 
   RMDir "$INSTDIR"
-
   DeleteRegKey /ifempty HKCU "Software\p2pool"
+
+SectionEnd
+
+Section "un.monerod" un.monerod
+  Delete "$INSTDIR\monerod.exe"
+  Delete "$INSTDIR\monero.LICENSE.txt"
+
+  RMDir "$INSTDIR"
+
+SectionEnd
+
+Section "un.Monero Blockchain"
+  Delete "$INSTDIR\bitmonero.log"
+  Delete "$INSTDIR\lmdb\data.mdb"
+  Delete "$INSTDIR\lmdb\lock.mdb"
+  RMDir "$INSTDIR\lmdb"
+  Delete "$INSTDIR\p2pstate.bin"
+
+  RMDir "$INSTDIR"
+
+SectionEnd
+
+Section "un.p2pool data"
+
+  Delete "$INSTDIR\p2pool.blocks"
+  Delete "$INSTDIR\p2pool.cache"
+  Delete "$INSTDIR\p2pool.log"
+  Delete "$INSTDIR\p2pool_peers.txt"
+
+  RMDir "$INSTDIR"
+
+SectionEnd
+
+Section "un.p2pool remembered wallet"
+  Delete "$INSTDIR\wallet.txt"
+
+  RMDir "$INSTDIR"
 
 SectionEnd
 
