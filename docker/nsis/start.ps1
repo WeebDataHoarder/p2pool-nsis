@@ -59,7 +59,7 @@ if ($Wallet -eq "") {
 
 $monerod = Start-Process .\monerod.exe -PassThru -ArgumentList "--data-dir=.","--log-file","$dir\bitmonero.log","--enable-dns-blocklist","--zmq-pub=tcp://127.0.0.1:18083","--rpc-bind-ip=127.0.0.1","--rpc-bind-port=18081","--restricted-rpc","--disable-dns-checkpoints","--fast-block-sync=1", "--sync-pruned-blocks","--prune-blockchain","--check-updates disabled","--in-peers=8","--out-peers=16","--add-priority-node","node.supportxmr.com:18080"
 
-Register-ObjectEvent -InputObject $monerod -EventName exited -Action {
+$dummy = Register-ObjectEvent -InputObject $monerod -EventName exited -Action {
     Stop-Process -Name "p2pool" -Confirm
     Get-EventSubscriber | Unregister-Event
     Stop-Process -Id $Pid -Force
