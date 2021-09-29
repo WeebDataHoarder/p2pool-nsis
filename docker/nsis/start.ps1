@@ -38,7 +38,9 @@ if ($Wallet -eq "") {
     $Wallet = Read-Host -Prompt 'Input your Monero payout Wallet (Primary Address only!)'
     $Wallet = $Wallet.Trim()
     Write-Output "Saving wallet address on `"$($dir)\wallet.txt`": $($Wallet)"
-    $Wallet | Out-File -Encoding utf8 "$($dir)\wallet.txt"
+
+    $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+    [System.IO.File]::WriteAllLines("$($dir)\wallet.txt", $Wallet, $Utf8NoBomEncoding)
 }
 
 Start-Process .\monerod.exe -ArgumentList "--data-dir=.","--log-file","$dir\bitmonero.log","--enable-dns-blocklist","--zmq-pub=tcp://127.0.0.1:18083","--rpc-bind-ip=127.0.0.1","--rpc-bind-port=18081","--restricted-rpc","--disable-dns-checkpoints","--fast-block-sync=1", "--sync-pruned-blocks","--prune-blockchain","--check-updates disabled","--in-peers=8","--out-peers=16","--add-priority-node","node.supportxmr.com:18080"

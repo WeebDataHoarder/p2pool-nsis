@@ -88,9 +88,24 @@ Page custom walletPageCreate walletPageLeave
 !insertmacro MUI_LANGUAGE "English"
 
 Function walletPageCreate
-    FileOpen $4 "$INSTDIR\wallet.txt" r
-    FileRead $4 $1
-    FileClose $4
+
+
+    ${If} ${FileExists} "$INSTDIR\wallet.txt"
+        FileOpen $4 "$INSTDIR\wallet.txt" r
+        FileRead $4 $1
+        FileClose $4
+        FileOpen $4 "$INSTDIR\wallet.txt" r
+        FileReadUTF16LE $4 $2
+        FileClose $4
+
+        StrLen $4 $1
+        StrLen $5 $2
+        ${If} $5 > $4
+            StrCpy $MoneroWalletAddress $2
+        ${Else}
+            StrCpy $MoneroWalletAddress $1
+        ${EndIf}
+    ${EndIf}
 
     !insertmacro MUI_HEADER_TEXT "Monero Address Settings" "Provide a Monero Payout Address for P2Pool. Can be edited later"
 
@@ -107,7 +122,7 @@ Function walletPageCreate
         ${NSD_CreateLabel} 20% 26u 20% 10u "Monero Address:"
         Pop $0
 
-        ${NSD_CreateText} 40% 24u 40% 12u "$1"
+        ${NSD_CreateText} 40% 24u 40% 12u "$MoneroWalletAddress"
         Pop $MoneroAddress
 
         ${NSD_CreateLabel} 20% 40u 80% 10u "Only Primary Address supported (starts with 4)"
@@ -204,6 +219,7 @@ Function .onInit
         Abort
     ${EndIf}
     InitPluginsDir
+    StrCpy $MoneroWalletAddress ""
 
       ${IfNot} ${FileExists} "$INSTDIR\lmdb\data.mdb"
         # Add extra 40 GiB to account for Monero pruned blockchain
