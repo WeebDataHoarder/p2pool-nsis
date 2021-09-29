@@ -25,7 +25,12 @@ RUN set -eux; \
 #    gpg --fingerprint "0x${XMRIG_GPGKEY_FINGERPRINT}" && \
 #    echo "${XMRIG_GPGKEY_FINGERPRINT}:6:" | gpg --import-ownertrust
 
-RUN mkdir /UserMgrPlugin && cd /UserMgrPlugin && curl https://nsis.sourceforge.io/mediawiki/images/4/4a/UserMgr_%282021%29.zip --output UserMgrPlugin.zip && \
+ARG USER_MGR_PLUGIN_URL="https://nsis.sourceforge.io/mediawiki/images/4/4a/UserMgr_%282021%29.zip"
+ARG USER_MGR_PLUGIN_HASH=6f9a22a8a201c2565b02fadecfb8eb930969985210dcc7f03e88fd1ac3f67618
+
+RUN mkdir /UserMgrPlugin && cd /UserMgrPlugin && \
+    curl "${USER_MGR_PLUGIN_URL}" --location --output UserMgrPlugin.zip && \
+    echo "${USER_MGR_PLUGIN_HASH}  UserMgrPlugin.zip" | sha256sum --check - && \
     unzip UserMgrPlugin.zip && \
     cp UserMgr/x86-Unicode/UserMgr.dll /usr/share/nsis/Plugins/x86-unicode/ && \
     cp UserMgr/x86-ANSI/UserMgr.dll /usr/share/nsis/Plugins/x86-ansi/ && \
