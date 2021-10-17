@@ -2,7 +2,7 @@
 
 set -ex
 
-export P2POOL_VERSION="v1.1"
+export P2POOL_VERSION="v1.2"
 #export XMRIG_VERSION="6.15.1"
 
 export SOURCE_DATE_EPOCH="$(date +%s)"
