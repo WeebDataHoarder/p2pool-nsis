@@ -52,8 +52,6 @@ COPY welcome.bmp /welcome.bmp
 COPY icon.ico /icon.ico
 COPY config /config
 
-COPY hashes.txt /hashes.txt
-
 WORKDIR /tmp
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -4,6 +4,7 @@ set -ex
 
 export P2POOL_VERSION="v1.5"
 export MONERO_VERSION="v0.17.3.0"
+export MONERO_SIGNATURES_URL="https://raw.githubusercontent.com/monero-project/monero-site/b3d989a725906da5591063578e4db38e5db0e74d/downloads/hashes.txt"
 
 export SOURCE_DATE_EPOCH="$(date +%s)"
 export GIT_HASH="0000000"
@@ -31,6 +32,7 @@ MONERO_FOLDER_NAME="monero-x86_64-w64-mingw32-${MONERO_VERSION}"
 curl "https://github.com/SChernykh/p2pool/releases/download/${P2POOL_VERSION}/${FOLDER_NAME}.zip" --location --output "${FOLDER_NAME}.zip"
 curl "https://github.com/SChernykh/p2pool/releases/download/${P2POOL_VERSION}/sha256sums.txt.asc" --location --output "sha256sums.txt.asc"
 curl "https://downloads.getmonero.org/cli/${MONERO_FILE_NAME}" --location --output "${MONERO_FILE_NAME}"
+curl "${MONERO_SIGNATURES_URL}" --location --output "hashes.txt"
 
 gpg --verify "sha256sums.txt.asc"
 
@@ -39,9 +41,9 @@ if [[ $(grep -iF $(sha256sum "${FOLDER_NAME}.zip"  | awk '{print $1}') sha256sum
   exit 1
 fi
 
-gpg --verify "/hashes.txt"
+gpg --verify "hashes.txt"
 
-if [[ $(grep -iF $(sha256sum "${MONERO_FILE_NAME}"  | awk '{print $1}') /hashes.txt) == "" ]]; then
+if [[ $(grep -iF $(sha256sum "${MONERO_FILE_NAME}"  | awk '{print $1}') hashes.txt) == "" ]]; then
   echo "Monero Signatures do not match"
   exit 1
 fi
