@@ -2,8 +2,8 @@
 
 set -ex
 
-export P2POOL_VERSION="v1.3"
-#export XMRIG_VERSION="6.15.1"
+export P2POOL_VERSION="v1.5"
+export MONERO_VERSION="v0.17.3.0"
 
 export SOURCE_DATE_EPOCH="$(date +%s)"
 export GIT_HASH="0000000"
@@ -25,14 +25,24 @@ rm -rvf /build/*
 mkdir output
 
 FOLDER_NAME="p2pool-${P2POOL_VERSION}-windows-x64"
+MONERO_FILE_NAME="monero-win-x64-${MONERO_VERSION}.zip"
+MONERO_FOLDER_NAME="monero-x86_64-w64-mingw32-${MONERO_VERSION}"
 
 curl "https://github.com/SChernykh/p2pool/releases/download/${P2POOL_VERSION}/${FOLDER_NAME}.zip" --location --output "${FOLDER_NAME}.zip"
 curl "https://github.com/SChernykh/p2pool/releases/download/${P2POOL_VERSION}/sha256sums.txt.asc" --location --output "sha256sums.txt.asc"
+curl "https://downloads.getmonero.org/cli/${MONERO_FILE_NAME}" --location --output "${MONERO_FILE_NAME}"
 
 gpg --verify "sha256sums.txt.asc"
 
 if [[ $(grep -iF $(sha256sum "${FOLDER_NAME}.zip"  | awk '{print $1}') sha256sums.txt.asc) == "" ]]; then
-  echo "Signatures do not match"
+  echo "P2Pool Signatures do not match (got $(sha256sum "${FOLDER_NAME}".zip))"
+  exit 1
+fi
+
+gpg --verify "/hashes.txt"
+
+if [[ $(grep -iF $(sha256sum "${MONERO_FILE_NAME}"  | awk '{print $1}') /hashes.txt) == "" ]]; then
+  echo "Monero Signatures do not match"
   exit 1
 fi
 
@@ -40,35 +50,18 @@ unzip "${FOLDER_NAME}.zip"
 
 pushd "${FOLDER_NAME}"
 cp p2pool.exe ../output/
-cp Monero/monerod.exe ../output/
-cp Monero/LICENSE ../output/monero.LICENSE
 
 popd
-
 curl "https://raw.githubusercontent.com/SChernykh/p2pool/${P2POOL_VERSION}/LICENSE" --location --output "output/p2pool.LICENSE"
 
-#
-#XMRIG_FOLDER_NAME="xmrig-${XMRIG_VERSION}-msvc-win64"
-#curl "https://github.com/xmrig/xmrig/releases/download/v${XMRIG_VERSION}/${XMRIG_FOLDER_NAME}.zip" --location --output "${XMRIG_FOLDER_NAME}.zip"
-#curl "https://github.com/xmrig/xmrig/releases/download/v${XMRIG_VERSION}/SHA256SUMS" --location --output "SHA256SUMS"
-#curl "https://github.com/xmrig/xmrig/releases/download/v${XMRIG_VERSION}/SHA256SUMS.sig" --location --output "SHA256SUMS.asc"
-#gpg --verify "SHA256SUMS.sig" "SHA256SUMS"
-#
-#sha256sum "${XMRIG_FOLDER_NAME}.zip"
-#
-#if [[ $(grep $(sha256sum "${XMRIG_FOLDER_NAME}.zip"  | awk '{print $1}') SHA256SUMS) == "" ]]; then
-#  echo "Signatures do not match"
-#  exit 1
-#fi
-#
-#unzip "${XMRIG_FOLDER_NAME}.zip"
-#
-#pushd "${XMRIG_FOLDER_NAME}"
-#cp p2pool.exe ../output/
-#cp Monero/monerod.exe ../output/
-#cp Monero/LICENSE ../output/monero.LICENSE
-#
-#popd
+
+unzip "${MONERO_FILE_NAME}"
+
+pushd "${MONERO_FOLDER_NAME}"
+cp monerod.exe ../output/
+cp LICENSE ../output/monero.LICENSE
+
+popd
 
 pushd output
 
@@ -77,6 +70,7 @@ cp /header.bmp ./
 cp /welcome.bmp ./
 cp /icon.ico ./
 cp /p2pool.nsi ./
+cp -r /config ./
 
 #Set mtime for reproducible builds
 for f in ./*; do

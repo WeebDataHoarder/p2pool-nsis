@@ -11,8 +11,10 @@ SetOverwrite on
 CRCCheck on
 Unicode True
 Var Dialog
+Var P2PoolConfig
 Var MoneroAddress
 Var MoneroWalletAddress
+Var P2PoolConfigSetting
 
 ;-------------------------------------------------------------------------------
 ; Constants
@@ -118,16 +120,25 @@ Function walletPageCreate
         Abort
     ${EndIf}
 
-    ${NSD_CreateGroupBox} 10% 10u 80% 62u "P2Pool Settings"
+    ${NSD_CreateGroupBox} 10% 10u 80% 80% "P2Pool Settings"
     Pop $0
 
-        ${NSD_CreateLabel} 20% 26u 20% 10u "Monero Address:"
+        ${NSD_CreateLabel} 20% 26u 20% 10u "Sidechain:"
         Pop $0
 
-        ${NSD_CreateText} 40% 24u 40% 12u "$MoneroWalletAddress"
+        ${NSD_CreateDropList} 40% 24u 40% 12u ""
+        Pop $P2PoolConfig
+          ${NSD_CB_AddString} $P2PoolConfig "main"
+          ${NSD_CB_AddString} $P2PoolConfig "mini"
+          ${NSD_CB_SelectString} $P2PoolConfig "main"
+
+        ${NSD_CreateLabel} 20% 40u 20% 10u "Monero Address:"
+        Pop $0
+
+        ${NSD_CreateText} 40% 38u 40% 12u "$MoneroWalletAddress"
         Pop $MoneroAddress
 
-        ${NSD_CreateLabel} 20% 40u 80% 10u "Only Primary Address supported (starts with 4)"
+        ${NSD_CreateLabel} 20% 56u 60% 10u "Only Primary Address supported (starts with 4)"
         Pop $0
 
     nsDialogs::Show
@@ -135,6 +146,7 @@ FunctionEnd
 
 Function walletPageLeave
     ${NSD_GetText} $MoneroAddress $MoneroWalletAddress
+    ${NSD_GetText} $P2PoolConfig $P2PoolConfigSetting
 FunctionEnd
 
 Section "p2pool" p2pool
@@ -148,6 +160,13 @@ Section "p2pool" p2pool
   File /oname=p2pool.LICENSE.txt p2pool.LICENSE
   File /oname=start.ps1 start.ps1
   File /oname=icon.ico icon.ico
+
+  ${If} $P2PoolConfigSetting == "main"
+    File /oname=config.json config/main.json
+  ${EndIf}
+  ${If} $P2PoolConfigSetting == "mini"
+    File /oname=config.json config/mini.json
+  ${EndIf}
 
   FileOpen $9 wallet.txt w
   FileWrite $9 "$MoneroWalletAddress"
@@ -198,11 +217,13 @@ SectionEnd
 
 
 
+
 Section "un.p2pool" un.p2pool
   Delete "$DESKTOP\P2Pool for Monero.lnk"
   Delete "$INSTDIR\p2pool.exe"
   Delete "$INSTDIR\start.ps1"
   Delete "$INSTDIR\icon.ico"
+  Delete "$INSTDIR\config.json"
   Delete "$INSTDIR\p2pool.LICENSE.txt"
   Delete "$INSTDIR\Uninstall.exe"
 

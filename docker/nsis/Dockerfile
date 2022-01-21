@@ -9,6 +9,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt update && \
 ARG P2POOL_GPGKEY_URL=https://raw.githubusercontent.com/monero-project/gitian.sigs/50672d1513f3aedc144a98b8b11224e9f6f75ef2/gitian-pubkeys/SChernykh.asc
 ARG P2POOL_GPGKEY_FINGERPRINT=1FCAAB4D3DC3310D16CBD508C47F82B54DA87ADF
 
+ARG MONERO_GPGKEY_URL=https://raw.githubusercontent.com/monero-project/monero/aa9ba3064e4b59f7c378561f2716ca129bc7f846/utils/gpg_keys/binaryfate.asc
+ARG MONERO_GPGKEY_FINGERPRINT=81AC591FE9C4B65C5806AFC3F0AF4D462A0BDF92
+
 
 # Import and trust GPG key for signed releases
 RUN set -eux; \
@@ -16,6 +19,10 @@ RUN set -eux; \
     gpg --fingerprint "0x${P2POOL_GPGKEY_FINGERPRINT}" && \
     echo "${P2POOL_GPGKEY_FINGERPRINT}:6:" | gpg --import-ownertrust
 
+RUN set -eux; \
+    curl "${MONERO_GPGKEY_URL}" | gpg --import - && \
+    gpg --fingerprint "0x${MONERO_GPGKEY_FINGERPRINT}" && \
+    echo "${MONERO_GPGKEY_FINGERPRINT}:6:" | gpg --import-ownertrust
 
 #ARG XMRIG_GPGKEY_URL=https://raw.githubusercontent.com/xmrig/xmrig/997f90dae73f74171a6d25e6b83f287715c4b0d0/doc/gpg_keys/xmrig.asc
 #ARG XMRIG_GPGKEY_FINGERPRINT=9AC4CEA8E66E35A5C7CDDC1B446A53638BE94409
@@ -43,6 +50,9 @@ COPY p2pool.nsi /p2pool.nsi
 COPY header.bmp /header.bmp
 COPY welcome.bmp /welcome.bmp
 COPY icon.ico /icon.ico
+COPY config /config
+
+COPY hashes.txt /hashes.txt
 
 WORKDIR /tmp
 
