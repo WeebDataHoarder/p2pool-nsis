@@ -79,6 +79,7 @@ Page custom walletPageCreate walletPageLeave
 ;!define MUI_FINISHPAGE_RUN_TEXT "Start P2Pool and Monero"
 
 !define MUI_FINISHPAGE_REBOOTLATER_DEFAULT 1
+!define MUI_FINISHPAGE_TEXT "You can open P2Pool from the shortcut on your Desktop."
 !define MUI_FINISHPAGE_TEXT_REBOOT "If you enabled Huge Pages as an Administrator you will have to reboot for them to take effect."
 !insertmacro MUI_PAGE_FINISH
 
