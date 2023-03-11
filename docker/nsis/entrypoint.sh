@@ -2,9 +2,9 @@
 
 set -ex
 
-export P2POOL_VERSION="v2.2.1"
-export MONERO_VERSION="v0.18.1.0"
-export MONERO_SIGNATURES_URL="https://raw.githubusercontent.com/monero-project/monero-site/3d1441e13cc470eedc6eaf708ede6cc6179ac27a/downloads/hashes.txt"
+export P2POOL_VERSION="v3.1"
+export MONERO_VERSION="v0.18.2.0"
+export MONERO_SIGNATURES_URL="https://raw.githubusercontent.com/monero-project/monero-site/54f1ca1d8d72f47a52e93339c1ab06679035ae56/downloads/hashes.txt"
 
 export SOURCE_DATE_EPOCH="$(date +%s)"
 export GIT_HASH="0000000"
