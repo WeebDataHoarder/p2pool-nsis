@@ -1,3 +1,9 @@
+# No longer maintained. Use [Gupax]
+
+This repository is no longer maintained, although it should keep working if you need new releases. 
+
+Use [[Gupax]](https://github.com/hinto-janai/gupax) instead, a P2Pool+Monero+XMRig GUI.
+
 # p2pool-nsis
 
 Windows installer for [Monero's P2Pool](https://github.com/SChernykh/p2pool).
